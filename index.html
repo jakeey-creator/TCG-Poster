@@ -1,0 +1,939 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kartenposter 10×15</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: Formular links, maßstabsgetreue Poster-Vorschau rechts (klebt beim Scrollen) */
+:root{
+  --bg:#EEF0F3; --panel:#FFFFFF; --fg:#16181E; --muted:#5E6572; --line:#D9DDE4;
+  --accent:#D2412B; --accent-fg:#FFFFFF; --field:#F6F7F9; --stage:#DADEE5;
+  --f-display:"Barlow Condensed","Arial Narrow",sans-serif;
+  --f-body:"Barlow",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12141A; --panel:#1B1E26; --fg:#ECEEF3; --muted:#9AA1AE; --line:#2C303B;
+  --accent:#F06A4F; --accent-fg:#16181E; --field:#232731; --stage:#0C0E12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12141A; --panel:#1B1E26; --fg:#ECEEF3; --muted:#9AA1AE; --line:#2C303B;
+  --accent:#F06A4F; --accent-fg:#16181E; --field:#232731; --stage:#0C0E12; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:24px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 24px;margin-bottom:20px}
+h1{font-family:var(--f-display);font-weight:800;font-size:34px;letter-spacing:.01em;margin:0;text-transform:uppercase;line-height:1}
+h1 span{color:var(--accent)}
+.sub{color:var(--muted);margin:0;font-size:14px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,440px);gap:24px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}.previewCol{position:static!important;order:-1}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+.form{display:flex;flex-direction:column;gap:18px}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+legend{font-family:var(--f-display);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding:0;margin-bottom:10px}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (max-width:480px){.row{grid-template-columns:minmax(0,1fr)}}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;min-width:0}
+label.f output{font-family:var(--f-mono);font-weight:500;color:var(--muted);font-size:12px}
+.lblrow{display:flex;justify-content:space-between;gap:8px}
+input[type=text],input[type=number],select{font:inherit;font-weight:500;color:var(--fg);background:var(--field);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:var(--field);color:var(--fg);border-radius:999px;padding:5px 11px 5px 8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.chip i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.chip[aria-pressed="true"]{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
+.chip input[type=color]{width:18px;height:18px;border:0;padding:0;background:none;cursor:pointer}
+.bgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px}
+.bg{font:inherit;border:1px solid var(--line);background:var(--field);color:var(--fg);border-radius:8px;padding:5px;cursor:pointer;display:flex;flex-direction:column;gap:5px;align-items:stretch;min-width:0}
+.bg canvas{width:100%;aspect-ratio:2/3;height:auto;border-radius:4px;display:block;background:var(--stage)}
+.bg span{font-size:11.5px;font-weight:600;line-height:1.2;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bg[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.bg .tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seed{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500}
+.check input{width:17px;height:17px;accent-color:var(--accent)}
+.drop{border:1.5px dashed var(--line);border-radius:8px;padding:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.drop.over{border-color:var(--accent);color:var(--fg)}
+.sub-box{border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.btn{font:inherit;font-weight:700;border-radius:8px;border:1px solid var(--line);background:var(--field);color:var(--fg);padding:8px 14px;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent);font-family:var(--f-display);font-size:18px;letter-spacing:.06em;text-transform:uppercase;padding:12px 18px;width:100%}
+.btn.primary:hover{filter:brightness(1.06)}
+.previewCol{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);display:flex;flex-direction:column;gap:12px}
+.stage{background:var(--stage);border-radius:10px;padding:22px;display:flex;justify-content:center}
+.stage canvas{width:100%;max-width:340px;height:auto;aspect-ratio:2/3;box-shadow:0 1px 2px rgba(0,0,0,.18),0 10px 28px rgba(0,0,0,.22);background:#fff}
+.meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.status{font-size:13px;color:var(--muted);min-height:1.4em}
+.hint{font-size:13px;color:var(--muted);margin:0}
+.tabbar{display:flex;flex-direction:column;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.tab{font:inherit;border:1px solid var(--line);background:var(--field);color:var(--fg);border-radius:8px;padding:6px;cursor:pointer;display:flex;gap:8px;align-items:center;min-width:0;text-align:left}
+.tab canvas{width:34px;aspect-ratio:2/3;height:auto;border-radius:3px;flex:none;background:var(--stage)}
+.tab b{display:block;font-family:var(--f-display);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.tab span{display:block;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tab .tt{min-width:0}
+.tab[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.tab[disabled]{opacity:.35;cursor:default}
+@media (max-width:520px){.tab canvas{display:none}}
+.pdfbox{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.pdfbox h2{font-family:var(--f-display);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0;font-weight:700}
+.btn.dark{background:var(--fg);color:var(--bg);border-color:var(--fg);font-family:var(--f-display);font-size:17px;letter-spacing:.06em;text-transform:uppercase;padding:11px 16px;width:100%}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Karten<span>poster</span> 10×15</h1>
+    <p class="sub">Poster für den Bilderrahmen · PNG in Druckauflösung · Kartenfeld maßgenau</p>
+  </header>
+
+  <div class="grid">
+    <form class="panel form" id="form" autocomplete="off">
+      <div class="tabbar">
+        <div class="tabs" id="tabs"></div>
+        <div class="btnrow">
+          <label class="f" style="flex-direction:row;align-items:center;gap:8px">Anzahl Poster
+            <select id="count" style="width:auto"><option>1</option><option>2</option><option>3</option><option selected>4</option></select>
+          </label>
+          <button type="button" class="btn" id="copyStyle">Stil auf alle übertragen</button>
+        </div>
+        <p class="hint">Jeder Reiter ist ein eigenes Poster. „Stil auf alle übertragen“ kopiert Hintergrund, Variante und Einstellungen vom aktuellen Poster auf die anderen. Die Typ-Farbe und die Texte bleiben dabei, wie sie sind.</p>
+      </div>
+      <fieldset>
+        <legend>Kopfzeile</legend>
+        <div class="row">
+          <label class="f">Name Pokémon (Header)<input type="text" id="header" value="Glurak"></label>
+          <label class="f">Zeile darüber (optional)<input type="text" id="eyebrow" value="30 Jahre Pokémon"></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Hintergrund</legend>
+        <div class="bgs" id="bgs"></div>
+        <div class="btnrow">
+          <button type="button" class="btn" id="reroll">Neu würfeln</button>
+          <button type="button" class="btn" id="surprise">Überrasch mich</button>
+          <span class="seed" id="seedTxt"></span>
+        </div>
+        <p class="hint">„Neu würfeln“ erzeugt eine neue Variante des gewählten Musters. „Überrasch mich“ wählt Muster, Typ-Farbe und Variante zufällig.</p>
+
+        <div class="sub-box" id="customBox">
+          <div class="drop" id="bgDrop">
+            <button type="button" class="btn" id="bgPick">Eigenes Bild hochladen</button>
+            <span id="bgTxt">JPG/PNG hierher ziehen – wird randlos eingepasst</span>
+            <input type="file" id="bgFile" accept="image/*" hidden>
+          </div>
+          <div class="row">
+            <label class="f"><span class="lblrow">Weichzeichnen <output id="blurOut">0</output></span><input type="range" id="bgBlur" min="0" max="10" step="1" value="0"></label>
+            <label class="f"><span class="lblrow">Bildausschnitt vertikal <output id="posOut">50 %</output></span><input type="range" id="bgPos" min="0" max="100" step="1" value="50"></label>
+          </div>
+        </div>
+
+        <div>
+          <div class="hint" style="margin-bottom:6px">Akzentfarbe nach Typ</div>
+          <div class="chips" id="chips"></div>
+        </div>
+
+        <div class="row">
+          <label class="f"><span class="lblrow">Abdunkeln / Aufhellen <output id="dimOut">0</output></span><input type="range" id="dim" min="-60" max="60" step="5" value="0"></label>
+          <label class="f">Schriftfarbe
+            <select id="ink">
+              <option value="auto">Automatisch (nach Hintergrund)</option>
+              <option value="light">Hell</option>
+              <option value="dark">Dunkel</option>
+            </select>
+          </label>
+        </div>
+        <label class="check"><input type="checkbox" id="panelOn"> Infofeld hinterlegen (besser lesbar auf unruhigen Mustern)</label>
+        <label class="check"><input type="checkbox" id="holo" checked> Holo-Schimmer hinter der Karte</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Kartenfeld</legend>
+        <div class="row">
+          <label class="f">Breite (mm)<input type="number" id="slotW" value="64" min="40" max="90" step="0.5"></label>
+          <label class="f">Höhe (mm)<input type="number" id="slotH" value="90" min="60" max="100" step="0.5"></label>
+        </div>
+        <label class="f">Markierung für die Karte
+          <select id="guide">
+            <option value="none">Keine (unsichtbar)</option>
+            <option value="corners">Nur Eckmarken</option>
+            <option value="mat">Passepartout-Linie außen</option>
+            <option value="dashed">Gestrichelte Linie</option>
+          </select>
+        </label>
+        <div class="drop" id="drop">
+          <button type="button" class="btn" id="pick">Kartenfoto wählen</button>
+          <span id="dropTxt">oder hierher ziehen – nur zur Vorschau</span>
+          <input type="file" id="file" accept="image/*" hidden>
+        </div>
+        <label class="check"><input type="checkbox" id="imgExport"> Kartenfoto auch ins PNG übernehmen</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Unter der Karte · links</legend>
+        <div class="row">
+          <label class="f">#Nummer (Pokédex)<input type="text" id="num" value="006"></label>
+          <label class="f">Name<input type="text" id="name" value="Glurak"></label>
+        </div>
+        <label class="f">Collection<input type="text" id="coll" value="Base Set"></label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Unter der Karte · rechts</legend>
+        <div class="row">
+          <label class="f">Edition<input type="text" id="edition" value="1. Edition" list="dlEdition"></label>
+          <label class="f">Kartennummer<input type="text" id="cardno" value="4/102"></label>
+        </div>
+        <label class="f">Special Edition<input type="text" id="special" value="Shadowless" list="dlSpecial"></label>
+        <div class="row">
+          <label class="f">Seltenheit<input type="text" id="rarity" value="Holo Rare" list="dlRarity"></label>
+          <label class="f">Sprache<input type="text" id="lang" value="Deutsch" list="dlLang"></label>
+        </div>
+        <datalist id="dlEdition"><option value="1. Edition"><option value="Unlimited"><option value="Shadowless"></datalist>
+        <datalist id="dlSpecial"><option value="—"><option value="Shadowless"><option value="Reverse Holo"><option value="Promo"><option value="Staff"><option value="Prerelease"><option value="Alt Art"><option value="PSA 10"></datalist>
+        <datalist id="dlRarity"><option value="Common"><option value="Uncommon"><option value="Rare"><option value="Holo Rare"><option value="Ultra Rare"><option value="Illustration Rare"><option value="Special Illustration Rare"><option value="Hyper Rare"><option value="Secret Rare"></datalist>
+        <datalist id="dlLang"><option value="Deutsch"><option value="Englisch"><option value="Japanisch"><option value="Französisch"><option value="Italienisch"><option value="Spanisch"><option value="Koreanisch"></datalist>
+      </fieldset>
+
+      <fieldset>
+        <legend>Export</legend>
+        <label class="f">Auflösung
+          <select id="dpi">
+            <option value="300">300 dpi · 1181 × 1772 px (Fotodruck)</option>
+            <option value="600">600 dpi · 2362 × 3543 px</option>
+          </select>
+        </label>
+      </fieldset>
+    </form>
+
+    <aside class="previewCol">
+      <div class="stage"><canvas id="cv" width="591" height="886" aria-label="Poster-Vorschau"></canvas></div>
+      <div class="meta"><span>100 × 150 mm</span><span id="px">1181 × 1772 px · 300 dpi</span></div>
+      <button type="button" class="btn primary" id="save">PNG speichern</button>
+      <div class="status" id="status" role="status"></div>
+      <div class="pdfbox">
+        <h2>Alle Poster als PDF</h2>
+        <label class="f">Seitenformat
+          <select id="layout">
+            <option value="a4">A4 quer · 2 Poster pro Seite</option>
+            <option value="a3">A3 · alle 4 auf einer Seite</option>
+            <option value="foto">10×15 · ein Poster pro Seite (Fotodrucker)</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" id="cutmarks" checked> Schnittmarken</label>
+        <button type="button" class="btn dark" id="pdf">PDF erstellen</button>
+        <div class="status" id="pdfStatus" role="status"></div>
+      </div>
+      <p class="hint">Druck: Fotoformat 10×15 wählen, „Originalgröße / 100 %“ und nicht zuschneiden – dann passt das Kartenfeld exakt. Beim PDF genauso: „Tatsächliche Größe“ statt „An Seite anpassen“.</p>
+    </aside>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(() => {
+  const TYPES = [
+    ["Feuer","#E0492B"],["Wasser","#2F7BD8"],["Pflanze","#3E9B4F"],["Elektro","#E9B31B"],
+    ["Psycho","#C9457E"],["Kampf","#A8532E"],["Unlicht","#4A4560"],["Metall","#7F8C99"],
+    ["Drache","#6A55C8"],["Fee","#DE82B8"],["Farblos","#A39C8E"]
+  ];
+  const BGS = [
+    {id:"nacht",    name:"Nacht"},
+    {id:"galerie",  name:"Galerie"},
+    {id:"typ",      name:"Typ-Verlauf"},
+    {id:"holo",     name:"Holo-Folie",     gen:true},
+    {id:"strahlen", name:"Strahlen",       gen:true},
+    {id:"waben",    name:"Waben",          gen:true},
+    {id:"kosmos",   name:"Kosmos",         gen:true},
+    {id:"wellen",   name:"Energie-Wellen", gen:true},
+    {id:"halbton",  name:"Halbton",        gen:true},
+    {id:"topo",     name:"Topografie",     gen:true},
+    {id:"kristall", name:"Kristall",       gen:true},
+    {id:"eigenes",  name:"Eigenes Bild"}
+  ];
+  const $ = id => document.getElementById(id);
+  const FIELDS = ["header","eyebrow","slotW","slotH","guide","num","name","coll","edition","cardno","special","rarity","lang","dpi","dim","ink","bgBlur","bgPos"];
+  const CHECKS = ["holo","imgExport","panelOn"];
+  const KEY = "kartenposter-v3";
+  let accent = TYPES[0][1];
+  let bgId = "kosmos";
+  let seed = 4127;
+  let cardImg = null, bgImg = null, bgImgData = null;
+
+  // ---------- Mehrere Poster: Zustand je Poster ----------
+  const PFIELDS = FIELDS.filter(k => k !== "dpi");
+  let posters = [], active = 0;
+  function getState(){
+    const st = {vals:{}, checks:{}, accent, bgId, seed, cardImg, bgImg, bgImgData, cardName:$("dropTxt").textContent, bgName:$("bgTxt").textContent};
+    PFIELDS.forEach(k => st.vals[k] = $(k).value);
+    CHECKS.forEach(k => st.checks[k] = $(k).checked);
+    return st;
+  }
+  function setState(st){
+    PFIELDS.forEach(k => { if (st.vals[k] != null) $(k).value = st.vals[k]; });
+    CHECKS.forEach(k => { if (st.checks[k] != null) $(k).checked = st.checks[k]; });
+    accent = st.accent; bgId = st.bgId; seed = st.seed;
+    cardImg = st.cardImg || null; bgImg = st.bgImg || null; bgImgData = st.bgImgData || null;
+    $("dropTxt").textContent = st.cardName || "oder hierher ziehen – nur zur Vorschau";
+    $("bgTxt").textContent = st.bgName || "JPG/PNG hierher ziehen – wird randlos eingepasst";
+  }
+  const base = getState();
+  const SAMPLES = [
+    {header:"Vivillon",    num:"0666", name:"Vivillon",       coll:"30th Celebration", edition:"30th C", cardno:"005/103", special:"30-Jahre-Logo",           rarity:"Häufig (C)",       lang:"Chinesisch", accent:"#3E9B4F", bgId:"kristall", seed:12},
+    {header:"Pikachu",     num:"0025", name:"Pikachu",        coll:"30th Celebration", edition:"30th C", cardno:"036/103", special:"Kosmos-Holo · Stempel 20/30", rarity:"Holo",       lang:"Chinesisch", accent:"#E9B31B", bgId:"kosmos",   seed:202},
+    {header:"Brutalanda",  num:"0373", name:"Brutalanda-ex",  coll:"30th Celebration", edition:"30th C", cardno:"088/103", special:"30-Jahre-Logo",           rarity:"Doppelselten (RR)", lang:"Chinesisch", accent:"#E0492B", bgId:"strahlen", seed:13},
+    {header:"Flegmon",     num:"0079", name:"Flegmon",        coll:"30th Celebration", edition:"30th C", cardno:"010/103", special:"30-Jahre-Logo",           rarity:"Häufig (C)",       lang:"Chinesisch", accent:"#2F7BD8", bgId:"wellen",   seed:3304}
+  ];
+  posters = SAMPLES.map(x => {
+    const st = structuredClone({vals:base.vals, checks:base.checks});
+    Object.assign(st, {accent:x.accent, bgId:x.bgId, seed:x.seed, cardImg:null, bgImg:null, bgImgData:null});
+    ["header","num","name","coll","edition","cardno","special","rarity","lang"].forEach(k => st.vals[k] = x[k]);
+    return st;
+  });
+
+  // ---------- Speicher (nur dieser Browser) ----------
+  function bgKey(i){ return KEY + "-bg-" + i; }
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY) || "null");
+    if (s && Array.isArray(s.posters)) {
+      s.posters.slice(0,4).forEach((p,i) => { posters[i] = {...posters[i], ...p, cardImg:null, bgImg:null, bgImgData:null}; if (!s.v4) posters[i].vals.guide = "none"; });
+      if (s.active != null) active = Math.min(3, Math.max(0, s.active));
+      if (s.count) $("count").value = s.count;
+      if (s.dpi) $("dpi").value = s.dpi;
+      if (s.layout) $("layout").value = s.layout;
+    }
+    posters.forEach((p,i) => {
+      const d = localStorage.getItem(bgKey(i));
+      if (d) { const im = new Image(); im.onload = () => { p.bgImg = im; p.bgImgData = d; p.bgName = "Gespeichertes Bild geladen"; if (i === active){ bgImg = im; bgImgData = d; $("bgTxt").textContent = p.bgName; } renderAll(); }; im.src = d; }
+    });
+  } catch (e) {}
+  setState(posters[active]);
+  function persist(){
+    posters[active] = getState();
+    try {
+      const out = posters.map(p => ({vals:p.vals, checks:p.checks, accent:p.accent, bgId:p.bgId, seed:p.seed}));
+      localStorage.setItem(KEY, JSON.stringify({v4:true, posters:out, active, count:$("count").value, dpi:$("dpi").value, layout:$("layout").value}));
+    } catch (e) {}
+  }
+
+  // ---------- Farbe ----------
+  function hexToRgb(h){ const n = parseInt(h.slice(1),16); return [n>>16&255, n>>8&255, n&255]; }
+  function hexToHsl(hex){
+    let [r,g,b] = hexToRgb(hex).map(v => v/255);
+    const mx = Math.max(r,g,b), mn = Math.min(r,g,b); let h=0, s=0; const l=(mx+mn)/2;
+    if (mx !== mn){ const d = mx-mn; s = l>.5 ? d/(2-mx-mn) : d/(mx+mn);
+      h = mx===r ? (g-b)/d + (g<b?6:0) : mx===g ? (b-r)/d+2 : (r-g)/d+4; h*=60; }
+    return [h, s*100, l*100];
+  }
+  const hsl = (h,s,l,a=1) => `hsla(${((h%360)+360)%360},${Math.max(0,Math.min(100,s))}%,${Math.max(0,Math.min(100,l))}%,${a})`;
+  function mulberry(a){ return () => { a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+
+  function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+  function vignette(ctx,W,H,a){
+    const g = ctx.createRadialGradient(W/2,H*.45,Math.min(W,H)*.3,W/2,H*.45,Math.max(W,H)*.75);
+    g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,`rgba(0,0,0,${a})`);
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  }
+  function linBg(ctx,W,H,c1,c2){ const g = ctx.createLinearGradient(0,0,W*.3,H); g.addColorStop(0,c1); g.addColorStop(1,c2); ctx.fillStyle=g; ctx.fillRect(0,0,W,H); }
+  function glow(ctx,x,y,r,col){ const g = ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,col); g.addColorStop(1,"rgba(0,0,0,0)"); ctx.fillStyle=g; ctx.fillRect(x-r,y-r,2*r,2*r); }
+
+  // ---------- Hintergründe (alle Maße in mm → auflösungsunabhängig) ----------
+  function drawBg(ctx, id, W, H, m, A, sd){
+    const [h,s,l] = hexToHsl(A);
+    const S = Math.max(s, 35);
+    const R = mulberry(sd);
+    const cx = W/2, cy = m(69);
+    ctx.save();
+    switch(id){
+      case "nacht":
+        linBg(ctx,W,H,"#161927","#0A0C13"); glow(ctx,cx,cy,m(70),hsl(h,S,50,.24)); break;
+      case "galerie":
+        linBg(ctx,W,H,"#FBFBFC","#E6E8EC"); glow(ctx,cx,cy,m(70),hsl(h,S,55,.12)); break;
+      case "typ":
+        linBg(ctx,W,H,hsl(h,S,Math.min(l,50)*.75),hsl(h,S,8)); glow(ctx,cx,cy,m(60),hsl(h,S,70,.25)); vignette(ctx,W,H,.35); break;
+
+      case "holo": {
+        linBg(ctx,W,H,hsl(h,30,11),hsl(h+30,35,5));
+        ctx.globalCompositeOperation = "screen";
+        for (let k=0;k<3;k++){
+          const ang = R()*Math.PI, L = Math.hypot(W,H)/2;
+          const g = ctx.createLinearGradient(cx-Math.cos(ang)*L, H/2-Math.sin(ang)*L, cx+Math.cos(ang)*L, H/2+Math.sin(ang)*L);
+          const base = h + R()*360, n = 10 + Math.floor(R()*6);
+          for (let i=0;i<=n;i++) g.addColorStop(i/n, hsl(base + i*47 + k*90, 95, 55, .10 + R()*.14));
+          ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+        }
+        ctx.globalCompositeOperation = "source-over";
+        ctx.strokeStyle = "rgba(255,255,255,.05)";
+        const ang2 = -0.6 + R()*.3;
+        for (let i=0;i<90;i++){ const x0 = R()*W*1.6 - W*.3; ctx.lineWidth = m(.1 + R()*1.2); ctx.beginPath(); ctx.moveTo(x0,0); ctx.lineTo(x0 + Math.tan(ang2)*H, H); ctx.stroke(); }
+        for (let i=0;i<170;i++){
+          const x=R()*W, y=R()*H, r=m(.08+R()*.35), a=.25+R()*.6;
+          ctx.fillStyle = `rgba(255,255,255,${a})`; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill();
+          if (R()<.12){ ctx.strokeStyle=`rgba(255,255,255,${a*.8})`; ctx.lineWidth=m(.12); const L=m(1.5+R()*2.5); ctx.beginPath(); ctx.moveTo(x-L,y); ctx.lineTo(x+L,y); ctx.moveTo(x,y-L); ctx.lineTo(x,y+L); ctx.stroke(); }
+        }
+        vignette(ctx,W,H,.55); break;
+      }
+      case "strahlen": {
+        const g = ctx.createRadialGradient(cx,cy,0,cx,cy,H*.8);
+        g.addColorStop(0,hsl(h,S,Math.max(38,l*.8))); g.addColorStop(1,hsl(h,S*.8,6));
+        ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+        const N = 2*(12 + Math.floor(R()*10)), rot = R()*Math.PI, Rr = H*1.2;
+        ctx.fillStyle = hsl(h,S,80,.09 + R()*.05);
+        for (let i=0;i<N;i+=2){ const a0 = rot + i*2*Math.PI/N, a1 = rot+(i+1)*2*Math.PI/N; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+Math.cos(a0)*Rr,cy+Math.sin(a0)*Rr); ctx.lineTo(cx+Math.cos(a1)*Rr,cy+Math.sin(a1)*Rr); ctx.closePath(); ctx.fill(); }
+        glow(ctx,cx,cy,m(55),"rgba(255,255,255,.16)");
+        vignette(ctx,W,H,.6); break;
+      }
+      case "waben": {
+        linBg(ctx,W,H,hsl(h,25,10),hsl(h,35,4));
+        const r = m(3.2 + R()*2.4), w = Math.sqrt(3)*r, rh = 1.5*r;
+        const fx = cx + (R()-.5)*m(40), fy = cy + (R()-.5)*m(60), maxD = Math.hypot(W,H)*.6;
+        ctx.lineWidth = m(.18);
+        for (let row=-1; row*rh < H + r; row++){
+          for (let col=-1; col*w < W + w; col++){
+            const x = col*w + (row%2 ? w/2 : 0), y = row*rh;
+            const d = Math.min(1, Math.hypot(x-fx,y-fy)/maxD), vis = Math.pow(1-d,1.4);
+            ctx.beginPath();
+            for (let k=0;k<6;k++){ const a = Math.PI/3*k + Math.PI/6; const px = x+Math.cos(a)*r*.94, py = y+Math.sin(a)*r*.94; k?ctx.lineTo(px,py):ctx.moveTo(px,py); }
+            ctx.closePath();
+            if (R() < .14){ ctx.fillStyle = hsl(h,S,55,(.08+R()*.3)*vis); ctx.fill(); }
+            ctx.strokeStyle = hsl(h,S,65,.06 + .32*vis); ctx.stroke();
+          }
+        }
+        glow(ctx,fx,fy,m(50),hsl(h,S,55,.18));
+        vignette(ctx,W,H,.45); break;
+      }
+      case "kosmos": {
+        linBg(ctx,W,H,hsl(h+200,45,7),hsl(h,40,3));
+        ctx.globalCompositeOperation = "screen";
+        for (let i=0;i<8;i++){
+          const hue = [h, h+40, h-60, h+180][Math.floor(R()*4)];
+          glow(ctx, R()*W, R()*H, m(22 + R()*50), hsl(hue, 80, 50, .14 + R()*.22));
+        }
+        ctx.globalCompositeOperation = "source-over";
+        for (let i=0;i<420;i++){ ctx.fillStyle=`rgba(255,255,255,${.15+R()*.7})`; ctx.beginPath(); ctx.arc(R()*W,R()*H,m(.05+R()*R()*.35),0,7); ctx.fill(); }
+        for (let i=0;i<10;i++){ const x=R()*W,y=R()*H; glow(ctx,x,y,m(2.5+R()*2),"rgba(255,255,255,.35)"); ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(x,y,m(.25),0,7); ctx.fill(); }
+        vignette(ctx,W,H,.4); break;
+      }
+      case "wellen": {
+        linBg(ctx,W,H,hsl(h,35,11),hsl(h,45,4));
+        glow(ctx,cx,cy,m(60),hsl(h,S,50,.22));
+        const n = 34 + Math.floor(R()*14);
+        const f1 = .025 + R()*.03, f2 = .06 + R()*.05, p1 = R()*6, p2 = R()*6, amp = 4 + R()*7;
+        for (let i=0;i<n;i++){
+          const t = i/(n-1), y0 = m(-10 + t*170), A1 = m(amp*(.5+Math.sin(Math.PI*t))), A2 = m(1.5+R()*2);
+          ctx.beginPath();
+          for (let xm=-2; xm<=102; xm+=1){
+            const y = y0 + A1*Math.sin(xm*f1*2*Math.PI/2 + p1 + t*2.2) + A2*Math.sin(xm*f2*Math.PI + p2 + t*5);
+            xm===-2 ? ctx.moveTo(m(xm),y) : ctx.lineTo(m(xm),y);
+          }
+          ctx.strokeStyle = hsl(h + (i%3)*12, S, 60 + (i%4)*6, .1 + .35*Math.sin(Math.PI*t));
+          ctx.lineWidth = m(.15 + (i%5===0 ? .35 : 0)); ctx.stroke();
+        }
+        vignette(ctx,W,H,.5); break;
+      }
+      case "halbton": {
+        linBg(ctx,W,H,hsl(h,S*.7,12),hsl(h,S*.8,5));
+        const g = m(2 + R()*1.2), fx = R()*W, fy = R()*H*.5, maxD = Math.hypot(W,H)*.85;
+        ctx.fillStyle = hsl(h,S,58,.75);
+        for (let y=0, r=0; y<H+g; y+=g*.866, r++){
+          for (let x = r%2 ? g/2 : 0; x<W+g; x+=g){
+            const d = Math.min(1, Math.hypot(x-fx,y-fy)/maxD), rad = g*.48*Math.pow(1-d,1.6);
+            if (rad > m(.05)){ ctx.beginPath(); ctx.arc(x,y,rad,0,7); ctx.fill(); }
+          }
+        }
+        vignette(ctx,W,H,.45); break;
+      }
+      case "topo": {
+        linBg(ctx,W,H,hsl(h,25,10),hsl(h,30,4));
+        const centers = 2 + Math.floor(R()*2);
+        for (let c=0;c<centers;c++){
+          const x0 = R()*W, y0 = R()*H, p1=R()*6,p2=R()*6,p3=R()*6, step = m(2 + R()*1.2);
+          for (let k=1;k<34;k++){
+            const r = k*step; ctx.beginPath();
+            for (let a=0;a<=Math.PI*2+.01;a+=Math.PI/90){
+              const rr = r*(1 + .14*Math.sin(3*a+p1) + .08*Math.sin(5*a+p2+k*.08) + .05*Math.sin(7*a+p3+k*.15));
+              const px = x0+Math.cos(a)*rr, py = y0+Math.sin(a)*rr; a===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+            }
+            const major = k%5===0;
+            ctx.strokeStyle = hsl(h,S,66, major ? .32 : .12); ctx.lineWidth = m(major ? .28 : .14); ctx.stroke();
+          }
+        }
+        glow(ctx,cx,cy,m(55),hsl(h,S,50,.14));
+        vignette(ctx,W,H,.45); break;
+      }
+      case "kristall": {
+        const cols = 7, rows = 10, pts = [];
+        for (let j=0;j<=rows;j++){ pts[j]=[]; for (let i=0;i<=cols;i++){
+          const edgeX = i===0||i===cols, edgeY = j===0||j===rows;
+          pts[j][i] = [ (i/cols)*W + (edgeX?0:(R()-.5)*W/cols*.8), (j/rows)*H + (edgeY?0:(R()-.5)*H/rows*.8) ];
+        }}
+        ctx.lineWidth = 1;
+        for (let j=0;j<rows;j++) for (let i=0;i<cols;i++){
+          const a=pts[j][i], b=pts[j][i+1], c=pts[j+1][i], d=pts[j+1][i+1];
+          const tris = R()<.5 ? [[a,b,d],[a,d,c]] : [[a,b,c],[b,d,c]];
+          tris.forEach(t => {
+            const my = (t[0][1]+t[1][1]+t[2][1])/3, mx = (t[0][0]+t[1][0]+t[2][0])/3;
+            const dc = Math.hypot(mx-cx,my-cy)/H;
+            const L = 6 + R()*12 + Math.max(0,.5-dc)*28;
+            const col = hsl(h + (R()-.5)*20, S*.85, L);
+            ctx.fillStyle = col; ctx.strokeStyle = col;
+            ctx.beginPath(); ctx.moveTo(...t[0]); ctx.lineTo(...t[1]); ctx.lineTo(...t[2]); ctx.closePath(); ctx.fill(); ctx.stroke();
+          });
+        }
+        ctx.globalCompositeOperation = "screen";
+        glow(ctx,cx,cy,m(45),hsl(h,S,60,.2));
+        ctx.globalCompositeOperation = "source-over";
+        vignette(ctx,W,H,.35); break;
+      }
+      case "eigenes": {
+        if (!bgImg){ linBg(ctx,W,H,"#2A2E3A","#15171E"); break; }
+        const ir = bgImg.width/bgImg.height, sr = W/H;
+        let dw, dh; if (ir > sr){ dh = H; dw = H*ir; } else { dw = W; dh = W/ir; }
+        const pos = (+$("bgPos").value)/100;
+        const dx = (W-dw)/2, dy = (H-dh)*pos;
+        const blur = +$("bgBlur").value;
+        if (blur > 0){
+          // Weichzeichnen per Verkleinern/Vergrößern – funktioniert in jedem Browser
+          const f = 1 + blur*1.6, tw = Math.max(4,Math.round(W/f)), th = Math.max(4,Math.round(H/f));
+          const tc = document.createElement("canvas"); tc.width=tw; tc.height=th;
+          const tx = tc.getContext("2d"); tx.imageSmoothingQuality = "high";
+          tx.drawImage(bgImg, dx/f, dy/f, dw/f, dh/f);
+          ctx.imageSmoothingQuality = "high"; ctx.drawImage(tc, 0, 0, W, H);
+        } else {
+          ctx.drawImage(bgImg, dx, dy, dw, dh);
+        }
+        break;
+      }
+    }
+    ctx.restore();
+  }
+
+  // ---------- Lesbarkeit: Helligkeit einer Fläche messen ----------
+  const probe = document.createElement("canvas"); probe.width = 8; probe.height = 8;
+  const pctx = probe.getContext("2d", {willReadFrequently:true});
+  function lum(src, x, y, w, h){
+    try {
+      pctx.clearRect(0,0,8,8); pctx.drawImage(src, x, y, w, h, 0, 0, 8, 8);
+      const d = pctx.getImageData(0,0,8,8).data; let sum = 0;
+      for (let i=0;i<d.length;i+=4) sum += (.2126*d[i] + .7152*d[i+1] + .0722*d[i+2])/255;
+      return sum/64;
+    } catch(e){ return 0; }
+  }
+  function palette(light){
+    const [h,s,l] = hexToHsl(accent), S = Math.max(s,40);
+    return light
+      ? {ink:"#F5F6F9", muted:"rgba(245,246,249,.68)", line:"rgba(255,255,255,.2)", acc:hsl(h,S,Math.max(l,62)), guide:"rgba(255,255,255,.6)", slot:"rgba(0,0,0,.30)", shadow:"rgba(0,0,0,.55)", panel:"rgba(8,10,16,.52)"}
+      : {ink:"#14161B", muted:"rgba(20,22,27,.64)", line:"rgba(20,22,27,.16)", acc:hsl(h,S,Math.min(l,40)), guide:"rgba(20,22,27,.55)", slot:"rgba(255,255,255,.35)", shadow:"rgba(255,255,255,.5)", panel:"rgba(255,255,255,.62)"};
+  }
+
+  // ---------- Text ----------
+  function drawText(ctx, text, x, y, {font, size, weight=400, color, spacing=0, align="left", maxW=Infinity, upper=false}){
+    text = String(text || ""); if (upper) text = text.toUpperCase();
+    let s = size;
+    const measure = () => { ctx.font = `${weight} ${s}px ${font}`; return ctx.measureText(text).width + spacing*s*Math.max(0,text.length-1); };
+    let w = measure();
+    while (w > maxW && s > size*0.4){ s *= 0.96; w = measure(); }
+    ctx.fillStyle = color; ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
+    let sx = align==="center" ? x - w/2 : align==="right" ? x - w : x;
+    if (!spacing){ ctx.fillText(text, sx, y); return w; }
+    for (const ch of text){ ctx.fillText(ch, sx, y); sx += ctx.measureText(ch).width + spacing*s; }
+    return w;
+  }
+  function withShadow(ctx, on, col, blur, fn){
+    ctx.save(); if (on){ ctx.shadowColor = col; ctx.shadowBlur = blur; } fn(); ctx.restore();
+  }
+
+  // ---------- Poster ----------
+  function draw(canvas, dpi, forExport){
+    const MM = dpi/25.4;
+    const W = Math.round(100*MM), H = Math.round(150*MM);
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext("2d");
+    const m = v => v*MM;
+    const v = k => $(k).value.trim();
+    const busy = !["nacht","galerie","typ"].includes(bgId);
+
+    drawBg(ctx, bgId, W, H, m, accent, seed);
+    const dim = +$("dim").value;
+    if (dim){ ctx.fillStyle = dim > 0 ? `rgba(0,0,0,${dim/100})` : `rgba(255,255,255,${-dim/100})`; ctx.fillRect(0,0,W,H); }
+
+    const sw = Math.min(90, Math.max(40, parseFloat($("slotW").value)||64));
+    const sh = Math.min(100, Math.max(60, parseFloat($("slotH").value)||90));
+    const sx = (100 - sw)/2, sy = 24;
+    const top = sy + sh + 5;
+    const panelOn = $("panelOn").checked;
+
+    // Schriftfarbe je Bereich
+    const mode = $("ink").value;
+    const pick = (x,y,w,h) => mode==="light" ? true : mode==="dark" ? false : lum(canvas, m(x), m(y), m(w), m(h)) < .55;
+    const tHead = palette(pick(8, 4, 84, 18));
+    const tSlot = palette(pick(sx, sy, sw, sh));
+    let tInfo = palette(panelOn ? (mode==="dark" ? false : mode==="light" ? true : pick(7, top, 86, 150-top-4)) : pick(7, top, 86, 150-top-4));
+
+    // Kopf
+    const eb = v("eyebrow");
+    withShadow(ctx, busy, tHead.shadow, m(1.2), () => {
+      if (eb) drawText(ctx, eb, W/2, m(10.8), {font:'"Barlow Condensed",sans-serif', size:m(2.5), weight:700, color:tHead.acc, spacing:.32, align:"center", upper:true, maxW:m(84)});
+      drawText(ctx, v("header") || " ", W/2, m(eb?20.6:18.5), {font:'"Barlow Condensed",sans-serif', size:m(10.5), weight:800, color:tHead.ink, spacing:.03, align:"center", upper:true, maxW:m(86)});
+    });
+
+    // Kartenfeld
+    const X=m(sx), Y=m(sy), SW=m(sw), SH=m(sh), R=m(3.2);
+    if ($("holo").checked){
+      ctx.save();
+      const hg = ctx.createLinearGradient(X-m(6), Y-m(4), X+SW+m(6), Y+SH+m(4));
+      ["#ff6b8b","#ffc46b","#f5ff7a","#7dffb0","#6bd6ff","#9b8bff","#ff7ad9"].forEach((c,i,a)=>hg.addColorStop(i/(a.length-1), c));
+      ctx.fillStyle = hg;
+      // nur außerhalb des Kartenfelds leuchten
+      ctx.beginPath(); ctx.rect(0,0,W,H); roundRect(ctx,X,Y,SW,SH,R); ctx.rect(0,0,0,0);
+      ctx.beginPath(); ctx.rect(0,0,W,H);
+      ctx.moveTo(X+R,Y); ctx.arcTo(X,Y,X,Y+SH,R); ctx.arcTo(X,Y+SH,X+SW,Y+SH,R); ctx.arcTo(X+SW,Y+SH,X+SW,Y,R); ctx.arcTo(X+SW,Y,X,Y,R); ctx.closePath();
+      ctx.clip("evenodd");
+      for (let i=12;i>=1;i--){ const e = m(i*.42); ctx.globalAlpha = .07; roundRect(ctx, X-e, Y-e, SW+2*e, SH+2*e, R+e); ctx.fill(); }
+      ctx.restore();
+    }
+    if ($("guide").value !== "none"){ roundRect(ctx,X,Y,SW,SH,R); ctx.fillStyle = tSlot.slot; ctx.fill(); }
+
+    const showImg = cardImg && (!forExport || $("imgExport").checked);
+    if (showImg){
+      ctx.save(); roundRect(ctx,X,Y,SW,SH,R); ctx.clip();
+      const ir = cardImg.width/cardImg.height, sr = SW/SH;
+      let dw, dh; if (ir > sr){ dh = SH; dw = SH*ir; } else { dw = SW; dh = SW/ir; }
+      ctx.drawImage(cardImg, X+(SW-dw)/2, Y+(SH-dh)/2, dw, dh);
+      ctx.restore();
+    }
+    const guide = $("guide").value;
+    ctx.strokeStyle = tSlot.guide; ctx.lineWidth = Math.max(1, m(0.18));
+    if (guide==="dashed" && !showImg){
+      ctx.setLineDash([m(1.4), m(1.1)]); roundRect(ctx,X,Y,SW,SH,R); ctx.stroke(); ctx.setLineDash([]);
+    } else if (guide==="corners"){
+      const L=m(4), o=m(1.2); ctx.lineWidth = Math.max(1,m(0.25)); ctx.beginPath();
+      [[X-o,Y-o,1,1],[X+SW+o,Y-o,-1,1],[X-o,Y+SH+o,1,-1],[X+SW+o,Y+SH+o,-1,-1]].forEach(([x,y,dx,dy])=>{ ctx.moveTo(x+dx*L,y); ctx.lineTo(x,y); ctx.lineTo(x,y+dy*L); });
+      ctx.stroke();
+    } else if (guide==="mat"){
+      ctx.strokeStyle = tSlot.acc; ctx.lineWidth = Math.max(1,m(0.3));
+      roundRect(ctx,X-m(1.8),Y-m(1.8),SW+m(3.6),SH+m(3.6),R+m(1.6)); ctx.stroke();
+    }
+
+    // Infobereich
+    if (panelOn){
+      ctx.fillStyle = tInfo.panel; roundRect(ctx, m(4), m(top-2.5), m(92), m(150-top-1.5), m(2.5)); ctx.fill();
+    }
+    const ruleY = m(top);
+    ctx.fillStyle = tInfo.line; ctx.fillRect(m(7), ruleY, m(86), Math.max(1,m(0.2)));
+    ctx.fillStyle = tInfo.acc; ctx.fillRect(m(7), ruleY - m(0.25), m(10), m(0.7));
+
+    withShadow(ctx, busy && !panelOn, tInfo.shadow, m(1), () => {
+      const lx = m(7), lw = m(38);
+      const n = v("num");
+      drawText(ctx, n ? "#" + n.replace(/^#/,"") : "", lx, m(top+8.2), {font:'"IBM Plex Mono",monospace', size:m(6.2), weight:600, color:tInfo.acc, maxW:lw});
+      drawText(ctx, v("name"), lx, m(top+14.6), {font:'"Barlow Condensed",sans-serif', size:m(5.4), weight:700, color:tInfo.ink, upper:true, spacing:.02, maxW:lw});
+      drawText(ctx, v("coll"), lx, m(top+19.8), {font:'"Barlow",sans-serif', size:m(3.0), weight:500, color:tInfo.muted, maxW:lw});
+
+      ctx.fillStyle = tInfo.line; ctx.fillRect(m(48.5), m(top+3), Math.max(1,m(0.2)), m(20));
+
+      const rx = m(52), rw = m(41);
+      const lab = {font:'"Barlow Condensed",sans-serif', size:m(1.85), weight:700, color:tInfo.muted, spacing:.2, upper:true};
+      const val = {font:'"Barlow",sans-serif', size:m(2.75), weight:600, color:tInfo.ink};
+      const rows = [
+        [["Edition", v("edition")],["Karte", v("cardno")]],
+        [["Special Edition", v("special") || "—"]],
+        [["Seltenheit", v("rarity")],["Sprache", v("lang")]]
+      ];
+      rows.forEach((row,i) => {
+        const by = top + 5.6 + i*6.9;
+        row.forEach(([l,val2],j) => {
+          const cx = rx + (j===1 ? m(24) : 0);
+          const cw = row.length===1 ? rw : (j===0 ? m(22.5) : m(17));
+          drawText(ctx, l, cx, m(by), {...lab, maxW:cw});
+          drawText(ctx, val2 || "—", cx, m(by+3.6), {...val, maxW:cw});
+        });
+      });
+    });
+    return {W,H};
+  }
+
+  // ---------- UI: Typ-Chips ----------
+  const chips = $("chips");
+  TYPES.forEach(([n,c]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.dataset.c = c;
+    b.innerHTML = `<i style="background:${c}"></i>${n}`;
+    b.addEventListener("click", () => { accent = c; syncChips(); renderAll(); });
+    chips.appendChild(b);
+  });
+  const own = document.createElement("label");
+  own.className = "chip"; own.title = "Eigene Farbe";
+  own.innerHTML = `<input type="color" id="accentPick" value="${accent}" aria-label="Eigene Akzentfarbe">Eigene`;
+  chips.appendChild(own);
+  $("accentPick").addEventListener("input", e => { accent = e.target.value.toUpperCase(); syncChips(); renderAll(); });
+  function syncChips(){
+    let hit = false;
+    chips.querySelectorAll("button.chip").forEach(b => { const on = b.dataset.c.toUpperCase() === accent.toUpperCase(); hit ||= on; b.setAttribute("aria-pressed", on); });
+    own.setAttribute("aria-pressed", !hit); own.style.borderColor = !hit ? "var(--fg)" : "";
+    try { $("accentPick").value = accent; } catch(e){}
+  }
+
+  // ---------- UI: Hintergrund-Galerie ----------
+  const bgWrap = $("bgs"), thumbs = {};
+  BGS.forEach(b => {
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "bg"; btn.dataset.id = b.id;
+    const c = document.createElement("canvas"); c.width = 110; c.height = 165;
+    const sp = document.createElement("span"); sp.textContent = b.name;
+    btn.append(c, sp);
+    btn.addEventListener("click", () => {
+      bgId = b.id; syncBg();
+      if (b.id === "eigenes" && !bgImg) $("bgFile").click();
+      render();
+    });
+    bgWrap.appendChild(btn); thumbs[b.id] = c;
+  });
+  function syncBg(){
+    bgWrap.querySelectorAll(".bg").forEach(b => b.setAttribute("aria-pressed", b.dataset.id === bgId));
+    const isGen = BGS.find(b => b.id === bgId)?.gen;
+    $("reroll").disabled = !isGen; $("reroll").style.opacity = isGen ? 1 : .5;
+    $("seedTxt").textContent = isGen ? "Variante " + seed : "";
+    $("customBox").hidden = bgId !== "eigenes";
+  }
+  let thumbT = 0;
+  function renderThumbs(){
+    clearTimeout(thumbT);
+    thumbT = setTimeout(() => {
+      BGS.forEach(b => {
+        const c = thumbs[b.id], ctx = c.getContext("2d"), MM = c.width/100, m = v => v*MM;
+        ctx.clearRect(0,0,c.width,c.height);
+        drawBg(ctx, b.id, c.width, c.height, m, accent, seed);
+        ctx.fillStyle = "rgba(0,0,0,.28)"; roundRect(ctx, m(18), m(24), m(64), m(90), m(3)); ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,.5)"; ctx.lineWidth = 1; ctx.stroke();
+        if (b.id === "eigenes" && !bgImg){ ctx.fillStyle="#fff"; ctx.font = "600 34px system-ui"; ctx.textAlign="center"; ctx.fillText("+", c.width/2, c.height/2+12); }
+      });
+    }, 60);
+  }
+
+  $("reroll").addEventListener("click", () => { seed = 1 + Math.floor(Math.random()*99999); syncBg(); renderAll(); });
+  $("surprise").addEventListener("click", () => {
+    const gens = BGS.filter(b => b.gen);
+    bgId = gens[Math.floor(Math.random()*gens.length)].id;
+    accent = TYPES[Math.floor(Math.random()*TYPES.length)][1];
+    seed = 1 + Math.floor(Math.random()*99999);
+    syncChips(); syncBg(); renderAll();
+  });
+
+  // ---------- Rendern ----------
+  const cv = $("cv");
+  let raf = 0;
+  function render(){
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      draw(cv, 150, false);
+      const d = +$("dpi").value;
+      $("px").textContent = Math.round(100*d/25.4) + " × " + Math.round(150*d/25.4) + " px · " + d + " dpi";
+      $("dimOut").textContent = $("dim").value;
+      $("blurOut").textContent = $("bgBlur").value;
+      $("posOut").textContent = $("bgPos").value + " %";
+      persist();
+      renderTabs();
+    });
+  }
+  function renderAll(){ renderThumbs(); render(); }
+
+  // ---------- Reiter ----------
+  const tabsEl = $("tabs"), tabCanvases = [];
+  for (let i=0;i<4;i++){
+    const b = document.createElement("button"); b.type = "button"; b.className = "tab";
+    const c = document.createElement("canvas"); c.width = 60; c.height = 90;
+    const tt = document.createElement("div"); tt.className = "tt";
+    tt.innerHTML = `<b>Poster ${i+1}</b><span></span>`;
+    b.append(c, tt);
+    b.addEventListener("click", () => switchTo(i));
+    tabsEl.appendChild(b); tabCanvases.push(c);
+  }
+  function switchTo(i){
+    if (i === active) return;
+    posters[active] = getState();
+    active = i; setState(posters[i]);
+    syncChips(); syncBg(); renderAll();
+  }
+  function withPoster(i, fn){
+    const cur = getState(); setState(posters[i]);
+    try { return fn(); } finally { setState(cur); }
+  }
+  let tabT = 0;
+  function renderTabs(){
+    clearTimeout(tabT);
+    tabT = setTimeout(() => {
+      posters[active] = getState();
+      const n = +$("count").value;
+      [...tabsEl.children].forEach((b,i) => {
+        b.setAttribute("aria-pressed", i === active);
+        b.disabled = i >= n;
+        b.querySelector("span").textContent = posters[i].vals.header || "—";
+        withPoster(i, () => draw(tabCanvases[i], 15.24, false));
+      });
+    }, 180);
+  }
+  $("count").addEventListener("change", () => {
+    const n = +$("count").value;
+    if (active >= n) { posters[active] = getState(); active = n-1; setState(posters[active]); syncChips(); syncBg(); renderAll(); }
+  });
+  $("copyStyle").addEventListener("click", () => {
+    posters[active] = getState();
+    const src = posters[active];
+    const STYLE = ["eyebrow","slotW","slotH","guide","dim","ink","bgBlur","bgPos"];
+    posters.forEach((p,i) => {
+      if (i === active) return;
+      STYLE.forEach(k => p.vals[k] = src.vals[k]);
+      Object.assign(p.checks, {holo:src.checks.holo, panelOn:src.checks.panelOn});
+      p.bgId = src.bgId; p.seed = src.seed;
+      if (src.bgId === "eigenes"){ p.bgImg = src.bgImg; p.bgImgData = src.bgImgData; p.bgName = src.bgName;
+        try { if (src.bgImgData) localStorage.setItem(bgKey(i), src.bgImgData); } catch(e){} }
+    });
+    renderAll();
+    $("status").textContent = "Stil auf alle Poster übertragen.";
+  });
+
+  $("form").addEventListener("input", render);
+  $("form").addEventListener("change", render);
+  $("form").addEventListener("submit", e => e.preventDefault());
+
+  // ---------- Bilder laden ----------
+  function readImage(f, cb){
+    if (!f || !f.type.startsWith("image/")) return;
+    const r = new FileReader();
+    r.onload = () => { const im = new Image(); im.onload = () => cb(im, r.result); im.src = r.result; };
+    r.readAsDataURL(f);
+  }
+  function setupDrop(zone, onFile){
+    ["dragenter","dragover"].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add("over"); }));
+    ["dragleave","drop"].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove("over"); }));
+    zone.addEventListener("drop", e => onFile(e.dataTransfer.files[0]));
+  }
+  function loadCard(f){ readImage(f, im => { cardImg = im; $("dropTxt").textContent = f.name || "Bild eingefügt"; render(); }); }
+  function loadBg(f){
+    readImage(f, im => {
+      bgImg = im; bgId = "eigenes"; $("bgTxt").textContent = f.name || "Bild eingefügt";
+      syncBg(); renderAll();
+      // verkleinerte Kopie im Browser merken
+      try {
+        const k = Math.min(1, 2400/Math.max(im.width, im.height)), c = document.createElement("canvas");
+        c.width = Math.round(im.width*k); c.height = Math.round(im.height*k);
+        c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+        bgImgData = c.toDataURL("image/jpeg", .9); localStorage.setItem(bgKey(active), bgImgData);
+      } catch(e){}
+    });
+  }
+  $("pick").addEventListener("click", () => $("file").click());
+  $("file").addEventListener("change", e => loadCard(e.target.files[0]));
+  $("bgPick").addEventListener("click", () => $("bgFile").click());
+  $("bgFile").addEventListener("change", e => loadBg(e.target.files[0]));
+  setupDrop($("drop"), loadCard);
+  setupDrop($("bgDrop"), loadBg);
+  window.addEventListener("paste", e => {
+    const it = [...(e.clipboardData?.items||[])].find(i => i.type.startsWith("image/"));
+    if (!it) return;
+    bgId === "eigenes" ? loadBg(it.getAsFile()) : loadCard(it.getAsFile());
+  });
+
+  // ---------- Export ----------
+  let downloads = null;
+  if (window.claude?.use) window.claude.use("downloads").then(d => downloads = d).catch(() => {});
+  const status = $("status");
+  $("save").addEventListener("click", async () => {
+    status.textContent = "PNG wird erstellt …";
+    const out = document.createElement("canvas");
+    draw(out, +$("dpi").value, true);
+    const blob = await new Promise(r => out.toBlob(r, "image/png"));
+    const slug = (($("header").value || "poster") + "-" + ($("cardno").value || "")).toLowerCase().replace(/[^a-z0-9äöüß]+/g,"-").replace(/^-|-$/g,"");
+    const filename = `poster-${slug || "karte"}-10x15.png`;
+    if (downloads){
+      try { await downloads.save({filename, data: blob}); status.textContent = "Gespeichert: " + filename; }
+      catch (e) { status.textContent = e && e.code === "declined" ? "Speichern abgebrochen." : "Speichern hier nicht möglich. Öffne die Seite als Datei und versuch es dort."; }
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    status.textContent = "PNG erstellt: " + filename;
+  });
+
+  async function offer(blob, filename, statusEl){
+    if (downloads){
+      try { await downloads.save({filename, data: blob}); statusEl.textContent = "Gespeichert: " + filename; }
+      catch (e) { statusEl.textContent = e && e.code === "declined" ? "Speichern abgebrochen." : "Speichern hier nicht möglich. Öffne die Seite als Datei und versuch es dort."; }
+      return;
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    statusEl.textContent = "Erstellt: " + filename;
+  }
+
+  $("pdf").addEventListener("click", async () => {
+    const st = $("pdfStatus");
+    if (!window.jspdf?.jsPDF){ st.textContent = "PDF-Baustein konnte nicht geladen werden. Seite neu laden und nochmal versuchen."; return; }
+    st.textContent = "PDF wird erstellt …";
+    await new Promise(r => setTimeout(r, 30));
+    posters[active] = getState();
+    const n = +$("count").value, layout = $("layout").value, marks = $("cutmarks").checked;
+    const imgs = [];
+    for (let i=0;i<n;i++){
+      withPoster(i, () => { const c = document.createElement("canvas"); draw(c, 300, true); imgs.push(c.toDataURL("image/jpeg", .95)); });
+    }
+    const {jsPDF} = window.jspdf;
+    const G = 6; // Abstand zwischen Postern in mm
+    let doc, pages = [];
+    if (layout === "foto"){
+      doc = new jsPDF({unit:"mm", format:[100,150], orientation:"portrait"});
+      pages = imgs.map(img => [[img, 0, 0]]);
+    } else if (layout === "a3"){
+      doc = new jsPDF({unit:"mm", format:"a3", orientation:"portrait"});
+      const x0 = (297 - (200+G))/2, y0 = (420 - (300+G))/2;
+      pages = [imgs.map((img,i) => [img, x0 + (i%2)*(100+G), y0 + Math.floor(i/2)*(150+G)])];
+    } else {
+      doc = new jsPDF({unit:"mm", format:"a4", orientation:"landscape"});
+      const x0 = (297 - (200+G))/2, y0 = (210 - 150)/2;
+      for (let i=0;i<imgs.length;i+=2) pages.push(imgs.slice(i,i+2).map((img,j) => [img, x0 + j*(100+G), y0]));
+    }
+    const pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
+    pages.forEach((items, pi) => {
+      if (pi) doc.addPage();
+      items.forEach(([img,x,y]) => {
+        doc.addImage(img, "JPEG", x, y, 100, 150, undefined, "NONE");
+        if (marks && layout !== "foto"){
+          doc.setDrawColor(90); doc.setLineWidth(0.15);
+          const o = 1, L = 2;
+          [[x,y,-1,-1],[x+100,y,1,-1],[x,y+150,-1,1],[x+100,y+150,1,1]].forEach(([cx,cy,dx,dy]) => {
+            doc.line(cx + dx*o, cy, cx + dx*(o+L), cy);
+            doc.line(cx, cy + dy*o, cx, cy + dy*(o+L));
+          });
+        }
+      });
+      if (layout !== "foto"){
+        doc.setFontSize(7); doc.setTextColor(130);
+        doc.text("Mit \"Tatsächliche Größe / 100 %\" drucken - jedes Poster 100 x 150 mm", pw/2, ph - 6, {align:"center"});
+      }
+    });
+    const fname = `kartenposter-${n}x-${layout === "foto" ? "10x15" : layout}.pdf`;
+    await offer(doc.output("blob"), fname, st);
+  });
+
+  syncChips(); syncBg(); renderAll();
+  Promise.all([
+    '800 40px "Barlow Condensed"','700 40px "Barlow Condensed"','600 40px "Barlow"','500 40px "Barlow"','600 40px "IBM Plex Mono"','500 40px "IBM Plex Mono"'
+  ].map(f => document.fonts.load(f).catch(()=>{}))).then(render);
+})();
+</script>
+
+</body>
+</html>
