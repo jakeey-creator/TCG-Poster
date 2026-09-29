@@ -1,4 +1,4 @@
-# Kartenposter 10×15
+# TCG-Poster · Kartenposter 10×15
 
 **Poster-Generator für Pokémon-Sammelkarten im 10×15-Bilderrahmen.**
 Mit dem Tool gestaltest du ein Poster mit Name, Nummer und Sammler-Infos, druckst es aus und klebst die echte Karte selbst in die freie Fläche. Das Tool ist eine einzelne HTML-Datei und braucht keine Installation.
