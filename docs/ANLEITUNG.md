@@ -33,7 +33,7 @@ Empfohlen sind aktuelle Versionen von Chrome, Edge, Firefox oder Safari, am Desk
 
 1. Im Repo auf **Settings → Pages** gehen.
 2. Unter *Build and deployment* **Source: Deploy from a branch** wählen, dann **Branch: `main`** und Ordner **`/ (root)`**.
-3. Speichern. Nach etwa einer Minute läuft das Tool unter `https://<dein-name>.github.io/kartenposter/`.
+3. Speichern. Nach etwa einer Minute läuft das Tool unter `https://jakeey-creator.github.io/TCG-Poster/`.
 
 GitHub Pages funktioniert nur mit einem **öffentlichen** Repo (oder mit einem kostenpflichtigen GitHub-Plan).
 
